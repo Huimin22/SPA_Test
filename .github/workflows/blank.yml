@@ -18,7 +18,7 @@ jobs:
       - name: Checkout Infra Repository
         uses: actions/checkout@v4
         with:
-          repository: 'Huimin22/SPA_Infra'
+          repository: 'Huimin22/SPA_Test'
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
