@@ -27,6 +27,7 @@ jobs:
         run: |
           cd spapath
           docker compose up -d
+          docker images
           sleep 20
 
       - name: Configure AWS Credentials
