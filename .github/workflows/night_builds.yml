@@ -29,8 +29,7 @@ jobs:
 
       - name: Build Containers
         run: |
-          # cd app
-          # docker compose up -d
+       
           docker-compose -f app/docker-compose.yml up -d
           sleep 20
 
