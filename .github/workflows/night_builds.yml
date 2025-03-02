@@ -19,6 +19,12 @@ jobs:
         with:
           repository: 'Huimin22/SPA_Test'
 
+      - name: Build Containers
+        run: |
+          cd app
+          docker compose up -d
+          sleep 20
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -26,12 +32,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region: us-east-1
-
-      - name: Build Containers
-        run: |
-       
-          docker-compose -f app/docker-compose.yml up -d
-          sleep 20
 
       - name: Push images to ECR
         run: |
