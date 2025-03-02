@@ -17,19 +17,15 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: 'Huimin22/SPA_APP'
-          path: "app"
+          path: "spapath"
           
       - name: List repository files
         run: ls -R
 
-      - name: Check if repository is checked out
-        run: git status
-
-
       - name: Build Containers
         run: |
-          cd app
-          docker compose up -d
+          cd spapath
+          docker-compose -f docker-compose-qa.yml up -d
           sleep 20
 
       - name: Configure AWS Credentials
