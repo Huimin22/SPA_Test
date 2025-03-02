@@ -38,26 +38,26 @@ jobs:
           aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
           aws-region: us-east-1
 
-      # - name: Push images to ECR
-      #   run: |
-      #     FRONTEND_IMAGE_ID=$(docker images --filter=reference="spapath-frontend" --format "{{.ID}}")
-      #     BACKEND_IMAGE_ID=$(docker images --filter=reference="spapath-backend" --format "{{.ID}}")
+      - name: Push images to ECR
+        run: |
+          FRONTEND_IMAGE_ID=$(docker images --filter=reference="spapath-frontend" --format "{{.ID}}")
+          BACKEND_IMAGE_ID=$(docker images --filter=reference="spapath-backend" --format "{{.ID}}")
 
-      #     echo "Found Docker Image ID (frontend): $FRONTEND_IMAGE_ID"
-      #     echo "Found Docker Image ID (backend): $BACKEND_IMAGE_ID"
+          echo "Found Docker Image ID (frontend): $FRONTEND_IMAGE_ID"
+          echo "Found Docker Image ID (backend): $BACKEND_IMAGE_ID"
 
-      #     aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com
 
-      #     TIMESTAMP=$(date "+%Y%m%d.%H%M%S")
-      #     echo "TIMESTAMP=$TIMESTAMP" >> $GITHUB_ENV
+          TIMESTAMP=$(date "+%Y%m%d.%H%M%S")
+          echo "TIMESTAMP=$TIMESTAMP" >> $GITHUB_ENV
 
-      #     docker tag $FRONTEND_IMAGE_ID 738250824273.dkr.ecr.us-east-1.amazonaws.com/appfrontend:$TIMESTAMP
-      #     docker tag $FRONTEND_IMAGE_ID 738250824273.dkr.ecr.us-east-1.amazonaws.com/appfrontend:latest
-      #     docker push --all-tags 738250824273.dkr.ecr.us-east-1.amazonaws.com/appfrontend
+          docker tag $FRONTEND_IMAGE_ID 738250824273.dkr.ecr.us-east-1.amazonaws.com/appfrontend:$TIMESTAMP
+          docker tag $FRONTEND_IMAGE_ID 738250824273.dkr.ecr.us-east-1.amazonaws.com/appfrontend:latest
+          docker push --all-tags 738250824273.dkr.ecr.us-east-1.amazonaws.com/appfrontend
 
-      #     docker tag $BACKEND_IMAGE_ID 738250824273.dkr.ecr.us-east-1.amazonaws.com/appbackend:$TIMESTAMP
-      #     docker tag $BACKEND_IMAGE_ID 738250824273.dkr.ecr.us-east-1.amazonaws.com/appbackend:latest
-      #     docker push --all-tags 738250824273.dkr.ecr.us-east-1.amazonaws.com/appbackend
+          docker tag $BACKEND_IMAGE_ID 738250824273.dkr.ecr.us-east-1.amazonaws.com/appbackend:$TIMESTAMP
+          docker tag $BACKEND_IMAGE_ID 738250824273.dkr.ecr.us-east-1.amazonaws.com/appbackend:latest
+          docker push --all-tags 738250824273.dkr.ecr.us-east-1.amazonaws.com/appbackend
 
       - name: Launch Temp EC2
         run: |
