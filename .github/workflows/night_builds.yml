@@ -18,6 +18,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: 'Huimin22/SPA_Test'
+      - name: List repository files
+        run: ls -R
+
 
       - name: Build Containers
         run: |
