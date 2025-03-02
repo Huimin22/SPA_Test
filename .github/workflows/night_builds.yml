@@ -40,8 +40,8 @@ jobs:
 
       - name: Push images to ECR
         run: |
-          FRONTEND_IMAGE_ID=$(docker images --filter=reference="frontend-container" --format "{{.ID}}")
-          BACKEND_IMAGE_ID=$(docker images --filter=reference="backend-container" --format "{{.ID}}")
+          FRONTEND_IMAGE_ID=$(docker images --filter=reference="spapath-frontend" --format "{{.ID}}")
+          BACKEND_IMAGE_ID=$(docker images --filter=reference="spapath-backend" --format "{{.ID}}")
 
           echo "Found Docker Image ID (frontend): $FRONTEND_IMAGE_ID"
           echo "Found Docker Image ID (backend): $BACKEND_IMAGE_ID"
