@@ -34,8 +34,8 @@ jobs:
 
       - name: Push images to ECR
         run: |
-          FRONTEND_IMAGE_ID=$(docker images --filter=reference="app-frontend" --format "{{.ID}}")
-          BACKEND_IMAGE_ID=$(docker images --filter=reference="app-backend" --format "{{.ID}}")
+          FRONTEND_IMAGE_ID=$(docker images --filter=reference="spa_app-frontend" --format "{{.ID}}")
+          BACKEND_IMAGE_ID=$(docker images --filter=reference="spa_app-backend" --format "{{.ID}}")
 
           echo "Found Docker Image ID (frontend): $FRONTEND_IMAGE_ID"
           echo "Found Docker Image ID (backend): $BACKEND_IMAGE_ID"
@@ -46,11 +46,11 @@ jobs:
           echo "TIMESTAMP=$TIMESTAMP" >> $GITHUB_ENV
 
           docker tag $FRONTEND_IMAGE_ID ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/${{ secrets.ECR_REPOSITORY_FRONTEND }}:$TIMESTAMP
-          docker tag $FRONTEND_IMAGE_ID ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/${{ secrets.ECR_REPOSITORY_FRONTEND }}:$IMAGE_TAG
+          docker tag $FRONTEND_IMAGE_ID ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/${{ secrets.ECR_REPOSITORY_FRONTEND }}:latest
           docker push --all-tags ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/${{ secrets.ECR_REPOSITORY_FRONTEND }}
 
           docker tag $BACKEND_IMAGE_ID ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/${{ secrets.ECR_REPOSITORY_BACKEND }}:$TIMESTAMP
-          docker tag $BACKEND_IMAGE_ID ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/${{ secrets.ECR_REPOSITORY_BACKEND }}:$IMAGE_TAG
+          docker tag $BACKEND_IMAGE_ID ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/${{ secrets.ECR_REPOSITORY_BACKEND }}:latest
           docker push --all-tags ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/${{ secrets.ECR_REPOSITORY_BACKEND }}
 
       - name: Launch Temporary EC2
