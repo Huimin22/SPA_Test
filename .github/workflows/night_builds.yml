@@ -28,7 +28,6 @@ jobs:
 
       - name: Build Containers
         run: |
-          cd app
           docker compose up -d
           sleep 20
 
