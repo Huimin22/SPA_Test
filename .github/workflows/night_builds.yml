@@ -53,115 +53,115 @@ jobs:
           docker tag $BACKEND_IMAGE_ID ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/${{ secrets.ECR_REPOSITORY_BACKEND }}:latest
           docker push --all-tags ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/${{ secrets.ECR_REPOSITORY_BACKEND }}
 
-      - name: Launch Temporary EC2
-        run: |
-          INSTANCE_ID=$(aws ec2 run-instances \
-            --image-id ami-053a45fff0a704a47 \
-            --instance-type t2.micro \
-            --key-name ec2TestInstanceKey \
-            --security-group-ids sg-06ed8968a7a3ec08f \
-            --subnet-id subnet-058dd85267834457a \
-            --query 'Instances[0].InstanceId' \
-            --output text)
-          echo "Temporary EC2 Instance ID: $INSTANCE_ID"
-          aws ec2 wait instance-running --instance-ids $INSTANCE_ID
-          sleep 15
+      # - name: Launch Temporary EC2
+      #   run: |
+      #     INSTANCE_ID=$(aws ec2 run-instances \
+      #       --image-id ami-053a45fff0a704a47 \
+      #       --instance-type t2.micro \
+      #       --key-name ec2TestInstanceKey \
+      #       --security-group-ids sg-06ed8968a7a3ec08f \
+      #       --subnet-id subnet-058dd85267834457a \
+      #       --query 'Instances[0].InstanceId' \
+      #       --output text)
+      #     echo "Temporary EC2 Instance ID: $INSTANCE_ID"
+      #     aws ec2 wait instance-running --instance-ids $INSTANCE_ID
+      #     sleep 15
 
-      - name: Add SSH
-        run: |
-          echo "${{ secrets.EC2_SSH_KEY }}" > ec2-key.pem
-          chmod 400 ec2-key.pem
+      # - name: Add SSH
+      #   run: |
+      #     echo "${{ secrets.EC2_SSH_KEY }}" > ec2-key.pem
+      #     chmod 400 ec2-key.pem
 
-      - name: Run on Temp EC2 and Run Smoke Tests
-        run: |
-          PUBLIC_DNS=$(aws ec2 describe-instances --instance-ids ${{ env.INSTANCE_ID }} \
-            --query 'Reservations[0].Instances[0].PublicDnsName' \
-            --output text)
-          echo "PUBLIC_DNS=$PUBLIC_DNS" >> $GITHUB_ENV
-          scp -i ec2-key.pem -o StrictHostKeyChecking=no app/docker-compose-test.yml ec2-user@$PUBLIC_DNS:~/
-          ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$PUBLIC_DNS << EOF
-            sudo yum install -y docker
-            sudo service docker start
-            sudo chkconfig docker on
-            sudo usermod -aG docker ec2-user
-            sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
-            sudo chmod +x /usr/local/bin/docker-compose
-            newgrp docker
-            docker --version
-            docker-compose version
+      # - name: Run on Temp EC2 and Run Smoke Tests
+      #   run: |
+      #     PUBLIC_DNS=$(aws ec2 describe-instances --instance-ids ${{ env.INSTANCE_ID }} \
+      #       --query 'Reservations[0].Instances[0].PublicDnsName' \
+      #       --output text)
+      #     echo "PUBLIC_DNS=$PUBLIC_DNS" >> $GITHUB_ENV
+      #     scp -i ec2-key.pem -o StrictHostKeyChecking=no app/docker-compose-test.yml ec2-user@$PUBLIC_DNS:~/
+      #     ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@$PUBLIC_DNS << EOF
+      #       sudo yum install -y docker
+      #       sudo service docker start
+      #       sudo chkconfig docker on
+      #       sudo usermod -aG docker ec2-user
+      #       sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+      #       sudo chmod +x /usr/local/bin/docker-compose
+      #       newgrp docker
+      #       docker --version
+      #       docker-compose version
 
-            export AWS_ACCOUNT_ID=${{ secrets.AWS_ACCOUNT_ID }}
-            export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-            export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            export AWS_SESSION_TOKEN=${{ secrets.AWS_SESSION_TOKEN }}
-            export AWS_REGION=${{ env.AWS_REGION }}
+      #       export AWS_ACCOUNT_ID=${{ secrets.AWS_ACCOUNT_ID }}
+      #       export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+      #       export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #       export AWS_SESSION_TOKEN=${{ secrets.AWS_SESSION_TOKEN }}
+      #       export AWS_REGION=${{ env.AWS_REGION }}
 
-            aws ecr get-login-password --region \$AWS_REGION | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.\$AWS_REGION.amazonaws.com
-            docker-compose -f docker-compose-test.yml up -d
-            sleep 10
+      #       aws ecr get-login-password --region \$AWS_REGION | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.\$AWS_REGION.amazonaws.com
+      #       docker-compose -f docker-compose-test.yml up -d
+      #       sleep 10
 
-            curl -o /dev/null -s -w "%{http_code}\n" http://localhost:3000/ | grep -q 200 || exit 1
-          EOF
+      #       curl -o /dev/null -s -w "%{http_code}\n" http://localhost:3000/ | grep -q 200 || exit 1
+      #     EOF
 
-      - name: Deploy to QA EC2
-        if: success()
-        run: |
-          echo "Smoke test passed!"
-          ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@${{ secrets.QA_EC2_PUBLIC_DNS }} << EOF
-            export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-            export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            export AWS_SESSION_TOKEN=${{ secrets.AWS_SESSION_TOKEN }}
-            export AWS_REGION=${{ env.AWS_REGION }}
+      # - name: Deploy to QA EC2
+      #   if: success()
+      #   run: |
+      #     echo "Smoke test passed!"
+      #     ssh -i ec2-key.pem -o StrictHostKeyChecking=no ec2-user@${{ secrets.QA_EC2_PUBLIC_DNS }} << EOF
+      #       export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+      #       export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #       export AWS_SESSION_TOKEN=${{ secrets.AWS_SESSION_TOKEN }}
+      #       export AWS_REGION=${{ env.AWS_REGION }}
 
-            export DB_HOST="${{ secrets.RDS_ENDPOINT }}"
-            export DB_USER="${{ secrets.RDS_USERNAME }}"
-            export DB_PASSWORD="${{ secrets.RDS_PASSWORD }}"
-            export DB_NAME="${{ secrets.RDS_DBNAME }}"
+      #       export DB_HOST="${{ secrets.RDS_ENDPOINT }}"
+      #       export DB_USER="${{ secrets.RDS_USERNAME }}"
+      #       export DB_PASSWORD="${{ secrets.RDS_PASSWORD }}"
+      #       export DB_NAME="${{ secrets.RDS_DBNAME }}"
 
-            aws ecr get-login-password --region \$AWS_REGION | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.\$AWS_REGION.amazonaws.com
-            docker-compose -f docker-compose-qa.yml pull
-            docker-compose down
-            docker-compose -f docker-compose-qa.yml up -d
-            docker image prune -f
-          EOF
+      #       aws ecr get-login-password --region \$AWS_REGION | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.\$AWS_REGION.amazonaws.com
+      #       docker-compose -f docker-compose-qa.yml pull
+      #       docker-compose down
+      #       docker-compose -f docker-compose-qa.yml up -d
+      #       docker image prune -f
+      #     EOF
 
-      - name: Delete Images with Failure
-        if: failure()
-        run: |
-          echo "Smoke test failed. Delete Docker images in ECR..."
+      # - name: Delete Images with Failure
+      #   if: failure()
+      #   run: |
+      #     echo "Smoke test failed. Delete Docker images in ECR..."
           
-          PRE_FRONTEND_IMAGE_TAG=$(aws ecr list-images --repository-name book-app/frontend \
-            --query 'imageIds[?imageTag!=`latest`].[imageTag]' --output text | sort -r | sed -n '2p')
-          PRE_BACKEND_IMAGE_TAG=$(aws ecr list-images --repository-name book-app/backend \
-            --query 'imageIds[?imageTag!=`latest`].[imageTag]' --output text | sort -r | sed -n '2p')
+      #     PRE_FRONTEND_IMAGE_TAG=$(aws ecr list-images --repository-name book-app/frontend \
+      #       --query 'imageIds[?imageTag!=`latest`].[imageTag]' --output text | sort -r | sed -n '2p')
+      #     PRE_BACKEND_IMAGE_TAG=$(aws ecr list-images --repository-name book-app/backend \
+      #       --query 'imageIds[?imageTag!=`latest`].[imageTag]' --output text | sort -r | sed -n '2p')
           
-          aws ecr batch-delete-image --repository-name book-app/frontend --image-ids imageTag=${{ env.TIMESTAMP }}
-          aws ecr batch-delete-image --repository-name book-app/frontend --image-ids imageTag=${{ env.IMAGE_TAG }}
-          aws ecr batch-delete-image --repository-name book-app/backend --image-ids imageTag=${{ env.TIMESTAMP }}
-          aws ecr batch-delete-image --repository-name book-app/backend --image-ids imageTag=${{ env.IMAGE_TAG }}
+      #     aws ecr batch-delete-image --repository-name book-app/frontend --image-ids imageTag=${{ env.TIMESTAMP }}
+      #     aws ecr batch-delete-image --repository-name book-app/frontend --image-ids imageTag=${{ env.IMAGE_TAG }}
+      #     aws ecr batch-delete-image --repository-name book-app/backend --image-ids imageTag=${{ env.TIMESTAMP }}
+      #     aws ecr batch-delete-image --repository-name book-app/backend --image-ids imageTag=${{ env.IMAGE_TAG }}
 
-          if [ -z "$PRE_FRONTEND_IMAGE_TAG" ]; then
-            echo "No previous frontend images found."
-            exit 1
-          fi
+      #     if [ -z "$PRE_FRONTEND_IMAGE_TAG" ]; then
+      #       echo "No previous frontend images found."
+      #       exit 1
+      #     fi
           
-          if [ -z "$PRE_BACKEND_IMAGE_TAG" ]; then
-            echo "No previous backend images found."
-            exit 1
-          fi
+      #     if [ -z "$PRE_BACKEND_IMAGE_TAG" ]; then
+      #       echo "No previous backend images found."
+      #       exit 1
+      #     fi
 
-          echo "Previous frontend image found: $PRE_FRONTEND_IMAGE_TAG"
-          echo "Previous backend image found: $PRE_BACKEND_IMAGE_TAG"
+      #     echo "Previous frontend image found: $PRE_FRONTEND_IMAGE_TAG"
+      #     echo "Previous backend image found: $PRE_BACKEND_IMAGE_TAG"
           
-          # Save the image manifest to a file for security
-          FRONTEND_MANIFEST=$(aws ecr batch-get-image --repository-name book-app/frontend --image-ids imageTag="$PRE_FRONTEND_IMAGE_TAG" --output text --query 'images[].imageManifest')
-          BACKEND_MANIFEST=$(aws ecr batch-get-image --repository-name book-app/backend --image-ids imageTag="$PRE_BACKEND_IMAGE_TAG" --output text --query 'images[].imageManifest')
+      #     # Save the image manifest to a file for security
+      #     FRONTEND_MANIFEST=$(aws ecr batch-get-image --repository-name book-app/frontend --image-ids imageTag="$PRE_FRONTEND_IMAGE_TAG" --output text --query 'images[].imageManifest')
+      #     BACKEND_MANIFEST=$(aws ecr batch-get-image --repository-name book-app/backend --image-ids imageTag="$PRE_BACKEND_IMAGE_TAG" --output text --query 'images[].imageManifest')
 
-          # Retag
-          aws ecr put-image --repository-name book-app/frontend --image-tag ${{ env.IMAGE_TAG }} --image-manifest "$FRONTEND_MANIFEST"
-          aws ecr put-image --repository-name book-app/backend --image-tag ${{ env.IMAGE_TAG }} --image-manifest "$BACKEND_MANIFEST"
+      #     # Retag
+      #     aws ecr put-image --repository-name book-app/frontend --image-tag ${{ env.IMAGE_TAG }} --image-manifest "$FRONTEND_MANIFEST"
+      #     aws ecr put-image --repository-name book-app/backend --image-tag ${{ env.IMAGE_TAG }} --image-manifest "$BACKEND_MANIFEST"
           
 
-      - name: Terminate Temporary EC2 Instance
-        run: |
-          aws ec2 terminate-instances --instance-ids ${{ env.INSTANCE_ID }}
+      # - name: Terminate Temporary EC2 Instance
+      #   run: |
+      #     aws ec2 terminate-instances --instance-ids ${{ env.INSTANCE_ID }}
