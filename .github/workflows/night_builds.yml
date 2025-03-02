@@ -19,8 +19,9 @@ jobs:
           repository: 'Huimin22/SPA_APP'
           path: "spapath"
           
-      - name: List repository files
-        run: ls -R
+      - name: Copy .env.local to .env
+        run: |
+          cp spapath/.env.local spapath/.env
 
       - name: Build Containers
         run: |
