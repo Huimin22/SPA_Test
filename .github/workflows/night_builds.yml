@@ -8,23 +8,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout Infra Repository
+        uses: actions/checkout@v4
+        with:
+          repository: 'Huimin22/SPA_Test'
+        
       - name: Checkout Source Repository
         uses: actions/checkout@v4
         with:
           repository: 'Huimin22/SPA_APP'
           path: "app"
-
-      - name: Checkout Infra Repository
-        uses: actions/checkout@v4
-        with:
-          repository: 'Huimin22/SPA_Test'
           
       - name: List repository files
         run: ls -R
 
       - name: Check if repository is checked out
         run: git status
-
 
 
       - name: Build Containers
