@@ -51,13 +51,13 @@ jobs:
           TIMESTAMP=$(date "+%Y%m%d.%H%M%S")
           echo "TIMESTAMP=$TIMESTAMP" >> $GITHUB_ENV
 
-          docker tag $FRONTEND_IMAGE_ID ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/${{ secrets.ECR_REPOSITORY_FRONTEND }}:$TIMESTAMP
-          docker tag $FRONTEND_IMAGE_ID ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/${{ secrets.ECR_REPOSITORY_FRONTEND }}:latest
-          docker push --all-tags ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/${{ secrets.ECR_REPOSITORY_FRONTEND }}
+          docker tag $FRONTEND_IMAGE_ID 738250824273.dkr.ecr.us-east-1.amazonaws.com/appfrontend:$TIMESTAMP
+          docker tag $FRONTEND_IMAGE_ID 738250824273.dkr.ecr.us-east-1.amazonaws.com/appfrontend:latest
+          docker push --all-tags 738250824273.dkr.ecr.us-east-1.amazonaws.com/appfrontend
 
-          docker tag $BACKEND_IMAGE_ID ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/${{ secrets.ECR_REPOSITORY_BACKEND }}:$TIMESTAMP
-          docker tag $BACKEND_IMAGE_ID ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/${{ secrets.ECR_REPOSITORY_BACKEND }}:latest
-          docker push --all-tags ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_REGION.amazonaws.com/${{ secrets.ECR_REPOSITORY_BACKEND }}
+          docker tag $BACKEND_IMAGE_ID 738250824273.dkr.ecr.us-east-1.amazonaws.com/appbackend:$TIMESTAMP
+          docker tag $BACKEND_IMAGE_ID 738250824273.dkr.ecr.us-east-1.amazonaws.com/appbackend:latest
+          docker push --all-tags 738250824273.dkr.ecr.us-east-1.amazonaws.com/appbackend
 
       # - name: Launch Temporary EC2
       #   run: |
