@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: 'Huimin22/SPA_Test'
-          path: infrapath
+          path: infra
         
       - name: Checkout Source Repository
         uses: actions/checkout@v4
@@ -193,7 +193,7 @@ jobs:
         
       - name: Remove Temp EC2 Server
         run: |
-              chmod +x infrapath/test.sh
+              chmod +x infra/test.sh
               ./infra/test.sh
         env:
           INSTANCE_ID: ${{ env.INSTANCE_ID }}
