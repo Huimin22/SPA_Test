@@ -74,7 +74,7 @@ jobs:
             --subnet-id subnet-0be6f1d701ddf7f3c \
             --query 'Instances[0].InstanceId' \
             --output text)
-          echo "Temporary EC2 Instance ID: $INSTANCE_ID"
+          echo "Temporary EC2 Instance ID: $INSTANCE_ID" >> $GITHUB_ENV
           aws ec2 wait instance-running --instance-ids $INSTANCE_ID
           sleep 15
 
@@ -82,8 +82,7 @@ jobs:
         id: get_instance_id
         run: |
           INSTANCE_ID=$(aws ec2 describe-instances --query 'Reservations[0].Instances[0].InstanceId' --output text)
-          echo "Temp INSTANCE_ID=$INSTANCE_ID" >> $GITHUB_ENV
-
+          echo "Temp INSTANCE_ID=$INSTANCE_ID"
 
       - name: Execute Tests on Temp EC2
         run: |
