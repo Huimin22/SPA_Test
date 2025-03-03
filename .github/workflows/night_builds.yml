@@ -48,24 +48,24 @@ jobs:
           echo "${{ secrets.EC2_SSH_KEY }}" > devop.pem
           chmod 400 devop.pem
 
-      # - name: Upload Images to ECR
-      #   run: |
-      #     FRONTEND_IMAGE_ID=$(docker images --filter=reference="spapath-frontend" --format "{{.ID}}")
-      #     BACKEND_IMAGE_ID=$(docker images --filter=reference="spapath-backend" --format "{{.ID}}")
+      - name: Upload Images to ECR
+        run: |
+          FRONTEND_IMAGE_ID=$(docker images --filter=reference="spapath-frontend" --format "{{.ID}}")
+          BACKEND_IMAGE_ID=$(docker images --filter=reference="spapath-backend" --format "{{.ID}}")
 
-      #     echo "Found Docker Image ID (frontend): $FRONTEND_IMAGE_ID"
-      #     echo "Found Docker Image ID (backend): $BACKEND_IMAGE_ID"
+          echo "Found Docker Image ID (frontend): $FRONTEND_IMAGE_ID"
+          echo "Found Docker Image ID (backend): $BACKEND_IMAGE_ID"
 
-      #     TIMESTAMP=$(date "+%Y%m%d.%H%M%S")
-      #     echo "TIMESTAMP=$TIMESTAMP" >> $GITHUB_ENV
+          TIMESTAMP=$(date "+%Y%m%d.%H%M%S")
+          echo "TIMESTAMP=$TIMESTAMP" >> $GITHUB_ENV
 
-      #     docker tag $FRONTEND_IMAGE_ID 738250824273.dkr.ecr.us-east-1.amazonaws.com/appfrontend:$TIMESTAMP
-      #     docker tag $FRONTEND_IMAGE_ID 738250824273.dkr.ecr.us-east-1.amazonaws.com/appfrontend:latest
-      #     docker push --all-tags 738250824273.dkr.ecr.us-east-1.amazonaws.com/appfrontend
+          docker tag $FRONTEND_IMAGE_ID 738250824273.dkr.ecr.us-east-1.amazonaws.com/appfrontend:$TIMESTAMP
+          docker tag $FRONTEND_IMAGE_ID 738250824273.dkr.ecr.us-east-1.amazonaws.com/appfrontend:latest
+          docker push --all-tags 738250824273.dkr.ecr.us-east-1.amazonaws.com/appfrontend
 
-      #     docker tag $BACKEND_IMAGE_ID 738250824273.dkr.ecr.us-east-1.amazonaws.com/appbackend:$TIMESTAMP
-      #     docker tag $BACKEND_IMAGE_ID 738250824273.dkr.ecr.us-east-1.amazonaws.com/appbackend:latest
-      #     docker push --all-tags 738250824273.dkr.ecr.us-east-1.amazonaws.com/appbackend
+          docker tag $BACKEND_IMAGE_ID 738250824273.dkr.ecr.us-east-1.amazonaws.com/appbackend:$TIMESTAMP
+          docker tag $BACKEND_IMAGE_ID 738250824273.dkr.ecr.us-east-1.amazonaws.com/appbackend:latest
+          docker push --all-tags 738250824273.dkr.ecr.us-east-1.amazonaws.com/appbackend
    
       - name: Launch Temp EC2 Instance
         run: |
@@ -81,11 +81,11 @@ jobs:
           aws ec2 wait instance-running --instance-ids $INSTANCE_ID
           sleep 15
 
-      # - name: Get Temp Instance ID
-      #   id: get_instance_id
-      #   run: |
-      #     INSTANCE_ID=$(aws ec2 describe-instances --query 'Reservations[0].Instances[0].InstanceId' --output text)
-      #     echo "Temp INSTANCE_ID=$INSTANCE_ID"
+      - name: Get Temp Instance ID
+        id: get_instance_id
+        run: |
+          INSTANCE_ID=$(aws ec2 describe-instances --query 'Reservations[0].Instances[0].InstanceId' --output text)
+          echo "Temp INSTANCE_ID=$INSTANCE_ID"
 
       - name: Execute Tests on Temp EC2
         run: |
