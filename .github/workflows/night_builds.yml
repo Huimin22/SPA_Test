@@ -194,12 +194,13 @@ jobs:
       #     aws ec2 terminate-instances --instance-ids ${{ env.INSTANCE_ID }}
 
         
-        - name: Remove Temp EC2 Server
-          env:
-            INSTANCE_ID: ${{ env.INSTANCE_ID }}
-          run: |
-            chmod +x infra/scripts/test.sh
-            ./infra/scripts/test.sh
+      - name: Remove Temp EC2 Server
+        run: |
+              chmod +x infra/test.sh
+              ./infra/test.sh
+        env:
+          INSTANCE_ID: ${{ env.INSTANCE_ID }}
+          
 
 
 
