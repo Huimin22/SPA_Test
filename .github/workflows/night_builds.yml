@@ -140,7 +140,7 @@ jobs:
 
             export DB_HOST="localdb.cvp0oraj48yg.us-east-1.rds.amazonaws.com"
             export DB_USER="admin"
-            export DB_PASSWORD="Mydb123456"
+            export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             export DB_NAME="food_db"
 
             aws ecr get-login-password --region \$AWS_REGION | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.\$AWS_REGION.amazonaws.com
